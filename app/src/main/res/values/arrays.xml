@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="category">
+        <item>Ультра-юниоры</item>
+        <item>Супер-юниоры</item>
+        <item>Юниоры</item>
+        <item>Открытая</item>
+        <item>Ветераны</item>
+        <item>Супер-ветераны</item>
+        <item>Ультра-ветераны</item>
+    </string-array>
+
+
+    <string-array name="pol">
+        <item>Мужчины</item>
+        <item>Женщины</item>
+        <item>Смешанный</item>
+    </string-array>
+
+</resources>

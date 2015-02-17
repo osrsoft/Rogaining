@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/button"
+        android:textSize="@dimen/text_size"
+        android:layout_margin="@dimen/btn_margin"
+        android:text="@string/itog"
+        android:id="@+id/tvItog"
+        android:layout_gravity="center_horizontal" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/text_size"
+        android:text="@string/back"
+        android:id="@+id/back_button"
+        android:background="@drawable/button"
+        android:layout_gravity="center_vertical"
+        android:layout_margin="@dimen/btn_margin"
+        android:onClick="onClick" />
+
+</LinearLayout>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Rogaining</string>
+    <string name="action_settings">Settings</string>
+    <string name="scan_btn">Сканировать QR-код</string>
+    <string name="kp_btn">Взятые КП</string>
+    <string name="upload_btn">Выгрузить данные</string>
+
+    <string name="DEFAULT_TITLE">Уставить Barcode Scanner?</string>
+    <string name="DEFAULT_MESSAGE">Приложению требуется Barcode Scanner. Установить его с Google Play?</string>
+
+    <string name="yes">ДА</string>
+    <string name="no">НЕТ</string>
+
+    <string name="start">СТАРТ</string>
+    <string name="finish">ФИНИШ</string>
+
+    <string name="start_title">Старт?</string>
+    <string name="start_message">Было считано КП СТАРТ. Информация о взятых КП будет удалена.</string>
+    <string name="start_btn_yes">Очистить базу</string>
+    <string name="start_btn_no">Отмена</string>
+
+    <string name="back">Назад</string>
+
+    <string name="ok">OK</string>
+
+    <string name="double_title">Внимание!</string>
+    <string name="double_message"> уже находится в списке взятых КП.</string>
+
+    <string name="success_upload_title">Поздравляем!</string>
+    <string name="success_upload_message">Данные успешно выгружены на сервер.</string>
+    <string name="error_upload_title">Ошибка!</string>
+    <string name="error_upload_message">Не удалось выгрузить данные. Не забыли ли вы подключиться к Wi-Fi?</string>
+
+    <string name="empty_name_title">Ошибка!</string>
+    <string name="empty_name_message">Заполните фамилию и название команды.</string>
+
+    <string name="name">ФИО</string>
+    <string name="time">Судейское время (ЧЧ:ММ:СС)</string>
+    <string name="comand">Название команды</string>
+    <string name="comand_num">Номер команды</string>
+    <string name="category">Категория команды</string>
+    <string name="pol">Пол</string>
+
+    <string name="itog">ИТОГО: </string>
+
+    <string name="incorrect_finish_title">Внимание!</string>
+    <string name="incorrect_finish_message"> Некорректно оформлен QR-код ФИНИШ. В нем должен находиться адрес сервера, логин и пароль на него!</string>
+
+    <string name="error">Ошибка!</string>
+    <string name="incorrect_time_message"> Неправильно введено судейское время либо некорректно установлено время на вашем устройстве.</string>
+    <string name="incorrect_distance_message">КП не засчитано. Оно относится к другой дистанции!</string>
+    <string name="incorrect_kp_message">КП не верно оформлено!</string>
+
+</resources>
