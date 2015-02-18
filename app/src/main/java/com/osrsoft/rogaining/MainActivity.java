@@ -181,9 +181,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                             SharedPreferences.Editor editor = sp.edit();
                             editor.putString("lastKp", txtKp);
                             editor.commit();
-
-                            Intent intent2 = new Intent(this, KpView.class);
-                            startActivity(intent2);
                         } else {
                             showIncorrectDistanceDialog();
                         }
@@ -201,6 +198,8 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                 e.printStackTrace();
             }
         }
+        Intent intent2 = new Intent(this, KpView.class);
+        startActivity(intent2);
     }
 
     private boolean notDouble(String s) { // Проверяет есть ли дубль строки s в таблице

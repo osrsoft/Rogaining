@@ -3,13 +3,16 @@ package com.osrsoft.rogaining;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -27,9 +30,10 @@ public class KpView extends ActionBarActivity  {
 
         SharedPreferences sp = getSharedPreferences("rogaining", Context.MODE_PRIVATE);
         String filename = sp.getString("filename", "noname");
+        String comandNum = sp.getString("comand_num", "-");
 
         int pos = 0;
-        ArrayList<HashMap<String, String>> list = new ArrayList<HashMap<String, String>>();
+        ArrayList<HashMap<String, Object>> list = new ArrayList<HashMap<String, Object>>();
         try {
             // открываем поток для чтения
             BufferedReader br = new BufferedReader(new InputStreamReader(openFileInput(filename)));
@@ -51,9 +55,17 @@ public class KpView extends ActionBarActivity  {
                     sumKp += Integer.valueOf(vesKp);
                 }
 
-                HashMap<String, String> map = new HashMap<String, String>();
+                File sdPath = Environment.getExternalStorageDirectory();
+                sdPath = new File(sdPath.getAbsolutePath() + "/Rogaining");
+                String s1[] = str.split(",");
+                File file = new File(sdPath.getAbsolutePath(), comandNum + "-" + s1[0] + ".jpeg");
+
+                Log.d("===", file.toString());
+
+                HashMap<String, Object> map = new HashMap<String, Object>();
                 map.put("qr-code", str);
                 map.put("time", str2);
+                map.put("img", file.toString());
                 list.add(map);
                 pos++;
             }
@@ -65,9 +77,9 @@ public class KpView extends ActionBarActivity  {
 
         ListView lv = (ListView) findViewById(R.id.listView);
         // создаем адаптер
-        SimpleAdapter adapter = new SimpleAdapter(this, list, android.R.layout.simple_list_item_2,
-                new String[] {"qr-code", "time"},
-                new int[] {android.R.id.text1, android.R.id.text2});
+        SimpleAdapter adapter = new SimpleAdapter(this, list, R.layout.kp_view_item,
+                new String[] {"qr-code", "time", "img"},
+                new int[] {R.id.text1, R.id.text2, R.id.imageView});
 
         // Создаем футер
         View foot = getLayoutInflater().inflate(R.layout.button, null);
