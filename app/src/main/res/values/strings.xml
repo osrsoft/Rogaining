@@ -6,6 +6,7 @@
     <string name="scan_btn">Сканировать QR-код</string>
     <string name="kp_btn">Взятые КП</string>
     <string name="upload_btn">Выгрузить данные</string>
+    <string name="photo_btn">Сделать фото</string>
 
     <string name="DEFAULT_TITLE">Уставить Barcode Scanner?</string>
     <string name="DEFAULT_MESSAGE">Приложению требуется Barcode Scanner. Установить его с Google Play?</string>

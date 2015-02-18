@@ -7,7 +7,9 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.os.AsyncTask;
+import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -29,6 +31,9 @@ import java.text.SimpleDateFormat;
 
 public class MainActivity extends ActionBarActivity implements View.OnClickListener {
 
+    public final int CAMERA_RESULT = 110;
+    public final int SCAN_RESULT = 130;
+
     private String filename;
     private String outputfile;
     private String url;
@@ -44,9 +49,11 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
 
         Button scanButton = (Button) findViewById(R.id.scan_button);
+        Button photoButton = (Button) findViewById(R.id.photo_button);
         Button kpButton = (Button) findViewById(R.id.kp_button);
         Button uploadButton = (Button) findViewById(R.id.upload_button);
         scanButton.setOnClickListener(this);
+        photoButton.setOnClickListener(this);
         kpButton.setOnClickListener(this);
         uploadButton.setOnClickListener(this);
 
@@ -78,7 +85,12 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         if(view.getId()==R.id.scan_button){
             //scan
             IntentIntegrator integrator = new IntentIntegrator(this);
-            integrator.initiateScan();
+            integrator.initiateScan(SCAN_RESULT);
+        }
+        if(view.getId()==R.id.photo_button){
+            // фото
+            Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            startActivityForResult(cameraIntent, CAMERA_RESULT);
         }
         if(view.getId()==R.id.kp_button){
             // список КП
@@ -93,82 +105,89 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
 
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        // Получение данных с камеры
+        if (requestCode == CAMERA_RESULT) {
+            Bitmap thumbnail = (Bitmap) intent.getExtras().get("data");
+        }
+
         // Получаем данные со сканера
-        IntentResult scanningResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
-        if (scanningResult != null) {
-            try {
-                // отрываем поток для записи
-                BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(openFileOutput(filename, MODE_APPEND)));
-                // пишем данные
-                String s = scanningResult.getContents();
-                s = s.replace("\r\n", ",");
-                // выделяем название дистанции
-                String s1[] = s.split(",");
-                if (s1.length > 1) {
-                    txtKp = s1[1];
-                }
-                if (txtKp.equals(getString(R.string.start))) {  // КП СТАРТ
-                    showStartDialog();
-                    distance = s1[0]; // Установили идентификатор дистанции
-
-                    SharedPreferences sp = getSharedPreferences("rogaining", Context.MODE_PRIVATE);
-                    SharedPreferences.Editor editor = sp.edit();
-                    editor.putString("distance", distance);
-                    editor.commit();
-
-                } else {
-                    String finish = getString(R.string.finish);
-                    if (txtKp.equals(finish)) {   // КП ФИНИШ
-                        Button upload_btn = (Button) findViewById(R.id.upload_button);
-                        upload_btn.setEnabled(true);
-
-                        if (s1.length < 5) { // Не правильно оформлено КП ФИНИШ
-                            showIncorrectFinishDialog();
-                            return;
-                        }
+        if (requestCode == SCAN_RESULT) {
+            IntentResult scanningResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
+            if (scanningResult != null) {
+                try {
+                    // отрываем поток для записи
+                    BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(openFileOutput(filename, MODE_APPEND)));
+                    // пишем данные
+                    String s = scanningResult.getContents();
+                    s = s.replace("\r\n", ",");
+                    // выделяем название дистанции
+                    String s1[] = s.split(",");
+                    if (s1.length > 1) {
+                        txtKp = s1[1];
+                    }
+                    if (txtKp.equals(getString(R.string.start))) {  // КП СТАРТ
+                        showStartDialog();
+                        distance = s1[0]; // Установили идентификатор дистанции
 
                         SharedPreferences sp = getSharedPreferences("rogaining", Context.MODE_PRIVATE);
                         SharedPreferences.Editor editor = sp.edit();
-                        editor.putBoolean("upload_enabled", true);
-                        editor.putString("upload_url", s1[2]);
-                        editor.putString("upload_user", s1[3]);
-                        editor.putString("upload_pass", s1[4]);
+                        editor.putString("distance", distance);
                         editor.commit();
-                    }
-                    if (s1.length < 3) {
-                        showIncorrectKpDialog();
-                        return;
-                    }
-                    String strKp = txtKp + ", " + s1[2]; // Строка для занесения в таблицу взятых КП
-                    SharedPreferences sp = getSharedPreferences("rogaining", Context.MODE_PRIVATE);
-                    int dTime = sp.getInt("dtime", 0);
-                    distance = sp.getString("distance", "");
-                    if (notDouble(strKp)) {  // Информации о КП еще нет в файле
-                        if (s1[0].equals(distance)) {
-                            SecretFile sf = new SecretFile();
-                            bw.write(sf.encode(strKp, filename));  // Информация с QR-кода
-                            bw.newLine();
-                            String cur = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss").format(System.currentTimeMillis() - dTime);
-                            bw.write(sf.encode(cur, filename));
-                            bw.newLine();
 
-                            Intent intent2 = new Intent(this, KpView.class);
-                            startActivity(intent2);
-                        } else {
-                            showIncorrectDistanceDialog();
-                        }
                     } else {
-                        // Повторное снятие КП
-                        showDoubleDialog(txtKp);
+                        String finish = getString(R.string.finish);
+                        if (txtKp.equals(finish)) {   // КП ФИНИШ
+                            Button upload_btn = (Button) findViewById(R.id.upload_button);
+                            upload_btn.setEnabled(true);
+
+                            if (s1.length < 5) { // Не правильно оформлено КП ФИНИШ
+                                showIncorrectFinishDialog();
+                                return;
+                            }
+
+                            SharedPreferences sp = getSharedPreferences("rogaining", Context.MODE_PRIVATE);
+                            SharedPreferences.Editor editor = sp.edit();
+                            editor.putBoolean("upload_enabled", true);
+                            editor.putString("upload_url", s1[2]);
+                            editor.putString("upload_user", s1[3]);
+                            editor.putString("upload_pass", s1[4]);
+                            editor.commit();
+                        }
+                        if (s1.length < 3) {
+                            showIncorrectKpDialog();
+                            return;
+                        }
+                        String strKp = txtKp + ", " + s1[2]; // Строка для занесения в таблицу взятых КП
+                        SharedPreferences sp = getSharedPreferences("rogaining", Context.MODE_PRIVATE);
+                        int dTime = sp.getInt("dtime", 0);
+                        distance = sp.getString("distance", "");
+                        if (notDouble(strKp)) {  // Информации о КП еще нет в файле
+                            if (s1[0].equals(distance)) {
+                                SecretFile sf = new SecretFile();
+                                bw.write(sf.encode(strKp, filename));  // Информация с QR-кода
+                                bw.newLine();
+                                String cur = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss").format(System.currentTimeMillis() - dTime);
+                                bw.write(sf.encode(cur, filename));
+                                bw.newLine();
+
+                                Intent intent2 = new Intent(this, KpView.class);
+                                startActivity(intent2);
+                            } else {
+                                showIncorrectDistanceDialog();
+                            }
+                        } else {
+                            // Повторное снятие КП
+                            showDoubleDialog(txtKp);
+                        }
+                        // закрываем поток
+                        bw.flush();
+                        bw.close();
                     }
-                    // закрываем поток
-                    bw.flush();
-                    bw.close();
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
             }
         }
 
@@ -290,7 +309,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                 bw.write(str);
                 bw.newLine();
                 //
-                Log.d("===", str);
+//                Log.d("===", str);
             }
             bw.flush();
             bw.close();

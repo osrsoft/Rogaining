@@ -25,9 +25,20 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="@dimen/text_size"
+        android:text="@string/photo_btn"
+        android:id="@+id/photo_button"
+        android:layout_weight="20"
+        android:background="@drawable/button"
+        android:layout_gravity="center_vertical"
+        android:layout_margin="@dimen/btn_margin" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/text_size"
         android:text="@string/kp_btn"
         android:id="@+id/kp_button"
-        android:layout_weight="10"
+        android:layout_weight="7"
         android:background="@drawable/button"
         android:layout_gravity="center_vertical"
         android:layout_margin="@dimen/btn_margin" />
