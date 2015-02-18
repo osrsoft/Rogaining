@@ -20,7 +20,7 @@ public final class IntentIntegrator {
 
     private static final String BS_PACKAGE = "com.google.zxing.client.android";
 
-    public static int REQUEST_CODE;
+    public static final int REQUEST_CODE = 113;
 
     // supported barcode formats
     public static final Collection<String> PRODUCT_CODE_TYPES = list("UPC_A", "UPC_E", "EAN_8", "EAN_13", "RSS_14");
@@ -117,8 +117,7 @@ public final class IntentIntegrator {
     /**
      * Initiates a scan for all known barcode types.
      */
-    public AlertDialog initiateScan(int scanResult) {
-        REQUEST_CODE = scanResult;
+    public AlertDialog initiateScan() {
         return initiateScan(ALL_CODE_TYPES);
     }
 
