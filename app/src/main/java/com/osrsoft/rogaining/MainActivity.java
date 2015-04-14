@@ -271,7 +271,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     }
 
     private void uploadData() {
-
         SharedPreferences sp = getSharedPreferences("rogaining", Context.MODE_PRIVATE);
         filename = sp.getString("filename", "");
         url = sp.getString("upload_url", "");
