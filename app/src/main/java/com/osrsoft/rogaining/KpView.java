@@ -123,7 +123,7 @@ public class KpView extends ActionBarActivity implements AdapterView.OnItemClick
 
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int pos, long id) {
-        if ((Integer)list.get(pos).get("icon") == R.drawable.file_exist) {
+        if ((Integer)list.get(pos).get("icon") == R.drawable.file_exist) { // Если фотография есть, то открываем ее
             Intent intent = new Intent(this, PhotoActivity.class);
             intent.putExtra("fname", (String) list.get(pos).get("img")); // Путь файла со снимком
             startActivity(intent);
