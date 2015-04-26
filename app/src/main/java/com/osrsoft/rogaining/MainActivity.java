@@ -1,6 +1,7 @@
 package com.osrsoft.rogaining;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -99,7 +100,9 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             // добавляем свой каталог к пути
             sdPath = new File(sdPath.getAbsolutePath() + "/Rogaining");
             sdPath.mkdirs();
-            File file = new File(sdPath.getAbsolutePath(), comandNum + "-" + lastKp + ".jpeg");
+
+            String s = lastKp.replace("КП", "KP").replace("№", "N").replace(getString(R.string.finish), "finish");
+            File file = new File(sdPath.getAbsolutePath(), comandNum + "-" + s + ".jpeg");
 
             Uri outputFileUri = Uri.fromFile(file);
             intent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
@@ -118,88 +121,96 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
 
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
-        // Получаем данные со сканера
-        IntentResult scanningResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
-        if (scanningResult != null) {
-            try {
-                // отрываем поток для записи
-                BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(openFileOutput(filename, MODE_APPEND)));
-                // пишем данные
-                String s = scanningResult.getContents();
-                s = s.replace("\r\n", ",");
-                // выделяем название дистанции
-                String s1[] = s.split(",");
-                if (s1.length > 1) {
-                    txtKp = s1[1];
-                }
-                if (txtKp.equals(getString(R.string.start))) {  // КП СТАРТ
-                    showStartDialog();
-                    distance = s1[0]; // Установили идентификатор дистанции
-
-                    SharedPreferences sp = getSharedPreferences("rogaining", Context.MODE_PRIVATE);
-                    SharedPreferences.Editor editor = sp.edit();
-                    editor.putString("distance", distance);
-                    editor.putString("lastKp", "start");
-                    editor.commit();
-
-                } else {
-                    String finish = getString(R.string.finish);
-                    if (txtKp.equals(finish)) {   // КП ФИНИШ
-                        Button upload_btn = (Button) findViewById(R.id.upload_button);
-                        upload_btn.setEnabled(true);
-
-                        if (s1.length < 5) { // Не правильно оформлено КП ФИНИШ
-                            showIncorrectFinishDialog();
-                            return;
-                        }
+        if (requestCode == IntentIntegrator.REQUEST_CODE) {
+            // Получаем данные со сканера
+            IntentResult scanningResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
+            if (scanningResult != null) {
+                try {
+                    // отрываем поток для записи
+                    BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(openFileOutput(filename, MODE_APPEND)));
+                    // пишем данные
+                    String s = scanningResult.getContents();
+                    s = s.replace("\r\n", ",");
+                    // выделяем название дистанции
+                    String s1[] = s.split(",");
+                    if (s1.length > 1) {
+                        txtKp = s1[1];
+                    }
+                    if (txtKp.equals(getString(R.string.start))) {  // КП СТАРТ
+                        showStartDialog();
+                        distance = s1[0]; // Установили идентификатор дистанции
 
                         SharedPreferences sp = getSharedPreferences("rogaining", Context.MODE_PRIVATE);
                         SharedPreferences.Editor editor = sp.edit();
-                        editor.putBoolean("upload_enabled", true);
-                        editor.putString("upload_url", s1[2]);
-                        editor.putString("upload_user", s1[3]);
-                        editor.putString("upload_pass", s1[4]);
+                        editor.putString("distance", distance);
+                        editor.putString("lastKp", "start");
                         editor.commit();
-                    }
-                    if (s1.length < 3) {
-                        showIncorrectKpDialog();
-                        return;
-                    }
-                    String strKp = txtKp + ", " + s1[2]; // Строка для занесения в таблицу взятых КП
-                    SharedPreferences sp = getSharedPreferences("rogaining", Context.MODE_PRIVATE);
-                    int dTime = sp.getInt("dtime", 0);
-                    distance = sp.getString("distance", "");
-                    if (notDouble(strKp)) {  // Информации о КП еще нет в файле
-                        if (s1[0].equals(distance)) {
-                            SecretFile sf = new SecretFile();
-                            bw.write(sf.encode(strKp, filename));  // Информация с QR-кода
-                            bw.newLine();
-                            String cur = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss").format(System.currentTimeMillis() - dTime);
-                            bw.write(sf.encode(cur, filename));
-                            bw.newLine();
 
-                            SharedPreferences.Editor editor = sp.edit();
-                            editor.putString("lastKp", txtKp);
-                            editor.commit();
-
-                            Intent intent2 = new Intent(this, KpView.class);
-                            startActivity(intent2);
-                        } else {
-                            showIncorrectDistanceDialog();
-                        }
                     } else {
-                        // Повторное снятие КП
-                        showDoubleDialog(txtKp);
+                        String finish = getString(R.string.finish);
+                        if (txtKp.equals(finish)) {   // КП ФИНИШ
+                            Button upload_btn = (Button) findViewById(R.id.upload_button);
+                            upload_btn.setEnabled(true);
+
+                            if (s1.length < 5) { // Не правильно оформлено КП ФИНИШ
+                                showIncorrectFinishDialog();
+                                return;
+                            }
+
+                            SharedPreferences sp = getSharedPreferences("rogaining", Context.MODE_PRIVATE);
+                            SharedPreferences.Editor editor = sp.edit();
+                            editor.putBoolean("upload_enabled", true);
+                            editor.putString("upload_url", s1[2]);
+                            editor.putString("upload_user", s1[3]);
+                            editor.putString("upload_pass", s1[4]);
+                            editor.commit();
+                        }
+                        if (s1.length < 3) {
+                            showIncorrectKpDialog();
+                            return;
+                        }
+                        String strKp = txtKp + ", " + s1[2]; // Строка для занесения в таблицу взятых КП
+                        SharedPreferences sp = getSharedPreferences("rogaining", Context.MODE_PRIVATE);
+                        int dTime = sp.getInt("dtime", 0);
+                        distance = sp.getString("distance", "");
+                        if (notDouble(strKp)) {  // Информации о КП еще нет в файле
+                            if (s1[0].equals(distance)) {
+                                SecretFile sf = new SecretFile();
+                                bw.write(sf.encode(strKp, filename));  // Информация с QR-кода
+                                bw.newLine();
+                                String cur = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss").format(System.currentTimeMillis() - dTime);
+                                bw.write(sf.encode(cur, filename));
+                                bw.newLine();
+
+                                SharedPreferences.Editor editor = sp.edit();
+                                editor.putString("lastKp", txtKp);
+                                editor.commit();
+
+                                Intent intent2 = new Intent(this, KpView.class);
+                                startActivity(intent2);
+                            } else {
+                                showIncorrectDistanceDialog();
+                            }
+                        } else {
+                            // Повторное снятие КП
+                            showDoubleDialog(txtKp);
+                        }
+                        // закрываем поток
+                        bw.flush();
+                        bw.close();
                     }
-                    // закрываем поток
-                    bw.flush();
-                    bw.close();
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
             }
+        }
+
+        if (requestCode == CAMERA_RESULT) {
+            // Ответ от камеры
+            Intent intent2 = new Intent(this, KpView.class);
+            startActivity(intent2);
         }
     }
 
@@ -229,7 +240,14 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         dialog.setPositiveButton(getString(R.string.start_btn_yes), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
+                // Удаляем файл с данными КП
                 deleteFile(filename);
+                // Удаляем фотографии
+                File dir = Environment.getExternalStorageDirectory();
+                dir = new File(dir.getAbsolutePath() + "/Rogaining");
+                for (File file : dir.listFiles()) {
+                    file.delete();
+                }
 
                 Button upload_btn = (Button) findViewById(R.id.upload_button);
                 upload_btn.setEnabled(false);
@@ -318,7 +336,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                 bw.write(str);
                 bw.newLine();
                 //
-//                Log.d("===", str);
             }
             bw.flush();
             bw.close();
@@ -353,31 +370,20 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                 mFTP.enterLocalPassiveMode();
                 mFTP.setFileType(FTP.ASCII_FILE_TYPE);
                 mFTP.storeFile(outputfile, fs);
-                mFTP.logout();
-                mFTP.disconnect();
                 fs.close();
 
                 // Выгружаем фотографии
                 File dir = Environment.getExternalStorageDirectory();
                 dir = new File(dir.getAbsolutePath() + "/Rogaining");
-                mFTP = new FTPClient();
-                mFTP.setConnectTimeout(2000);
-                urlPort = url.split(":");
-                if (urlPort.length > 1) {
-                    mFTP.connect(urlPort[0], Integer.valueOf(urlPort[1]));
-                } else {
-                    mFTP.connect(url);
-                }
-                mFTP.login(user, pass);
-                mFTP.enterLocalPassiveMode();
                 mFTP.setFileType(FTP.BINARY_FILE_TYPE);
                 for (File file : dir.listFiles()) {
-                    fs = openFileInput(file.toString());
-                    mFTP.storeFile(file.toString(), fs);
+                    // выгружаем файл на FTP
+                    FileInputStream fis = new FileInputStream(file);
+                    mFTP.storeFile(file.getName(), fis);
+                    fis.close();
                 }
                 mFTP.logout();
                 mFTP.disconnect();
-                fs.close();
                 successUpload = true;
             } catch (IOException e) {
                 successUpload = false;
@@ -387,9 +393,22 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         }
 
         @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            Button upload = (Button) findViewById(R.id.upload_button);
+            upload.setEnabled(false);
+            upload.setText(R.string.uploading);
+            upload.setTextColor(getResources().getColor(R.color.red));
+        }
+
+        @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
             showUploadDialog(successUpload);
+            Button upload = (Button) findViewById(R.id.upload_button);
+            upload.setEnabled(true);
+            upload.setText(R.string.upload_btn);
+            upload.setTextColor(getResources().getColor(R.color.black));
         }
 
         private AlertDialog showUploadDialog(boolean success) {

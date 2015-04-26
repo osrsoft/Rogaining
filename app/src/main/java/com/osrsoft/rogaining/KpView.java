@@ -63,7 +63,8 @@ public class KpView extends ActionBarActivity implements AdapterView.OnItemClick
                 File sdPath = Environment.getExternalStorageDirectory();
                 sdPath = new File(sdPath.getAbsolutePath() + "/Rogaining");
                 String s1[] = str.split(",");
-                File file = new File(sdPath.getAbsolutePath(), comandNum + "-" + s1[0] + ".jpeg");
+                String s2 = s1[0].replace("КП", "KP").replace("№", "N").replace(getString(R.string.finish), "finish");
+                File file = new File(sdPath.getAbsolutePath(), comandNum + "-" + s2 + ".jpeg");
 
                 int icon;
                 if (fileExist(file)) {

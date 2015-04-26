@@ -33,6 +33,7 @@
     <string name="success_upload_message">Данные успешно выгружены на сервер.</string>
     <string name="error_upload_title">Ошибка!</string>
     <string name="error_upload_message">Не удалось выгрузить данные. Не забыли ли вы подключиться к Wi-Fi?</string>
+    <string name="uploading">Идет выгрузка данных...</string>
 
     <string name="empty_name_title">Ошибка!</string>
     <string name="empty_name_message">Заполните фамилию и название команды.</string>
