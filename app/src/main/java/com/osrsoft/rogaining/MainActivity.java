@@ -36,6 +36,8 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
     public final int CAMERA_RESULT = 110;
 
+    public final int MAX_FILE_SIZE = 400000; // Максимально допустимый размер файла фотографии
+
     private String filename;
     private String outputfile;
     private String url;
@@ -209,8 +211,22 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
         if (requestCode == CAMERA_RESULT) {
             // Ответ от камеры
-            Intent intent2 = new Intent(this, KpView.class);
-            startActivity(intent2);
+
+            SharedPreferences sp = getSharedPreferences("rogaining", Context.MODE_PRIVATE);
+            String comandNum = sp.getString("comand_num", "-");
+            String lastKp = sp.getString("lastKp", "-");
+
+            File sdPath = Environment.getExternalStorageDirectory();
+            sdPath = new File(sdPath.getAbsolutePath() + "/Rogaining");
+            String s1[] = lastKp.split(",");
+            String s2 = s1[0].replace("КП", "KP").replace("№", "N").replace(getString(R.string.finish), "finish");
+            File file = new File(sdPath.getAbsolutePath(), comandNum + "-" + s2 + ".jpeg");
+            if (file.length() > MAX_FILE_SIZE) {
+                showLargeFileDialog();
+            } else {
+                Intent intent2 = new Intent(this, KpView.class);
+                startActivity(intent2);
+            }
         }
     }
 
@@ -288,6 +304,20 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         });
         return dialog.show();
     }
+
+    private AlertDialog showLargeFileDialog() {
+        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+        dialog.setTitle(getString(R.string.large_file));
+        dialog.setMessage(getString(R.string.large_file_text));
+        dialog.setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+            }
+        });
+        return dialog.show();
+    }
+
+
 
     private void uploadData() {
         SharedPreferences sp = getSharedPreferences("rogaining", Context.MODE_PRIVATE);

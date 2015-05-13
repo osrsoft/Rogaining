@@ -55,4 +55,7 @@
     <string name="incorrect_distance_message">КП не засчитано. Оно относится к другой дистанции!</string>
     <string name="incorrect_kp_message">КП не верно оформлено!</string>
 
+    <string name="large_file">Слишком большой файл!</string>
+    <string name="large_file_text">Установите разрешение камеры на минимальное значение. Рекомендуется 640*480.</string>
+
 </resources>
